@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ProdutosTeste.Models;
 
 namespace ProdutosTeste.Controllers;
 
@@ -14,7 +15,7 @@ public class ProductsController : ControllerBase
   }
 
   [HttpGet]
-  public async Task<ActionResult<Pagy<Product>>> GetProducts(
+  public async Task<ActionResult<PaginatedResponse<Product>>> GetProducts(
     [FromQuery]
     int page = 1,
     [FromQuery]
@@ -22,9 +23,10 @@ public class ProductsController : ControllerBase
   {
     pageSize = Math.Min(pageSize, 20);
 
-    var paginatedData = await _dbContext.Products.AddPagination(page, pageSize);
+    var (data, pagy) = await _dbContext.Products.AddPagination(page, pageSize);
+    var response = new PaginatedResponse<Product>(data, pagy);
 
-    return Ok(paginatedData);
+    return Ok(response);
   }
 
   [HttpPost]
