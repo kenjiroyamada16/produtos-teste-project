@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
-import '../di/core_module.dart';
+import '../../di/core_module.dart';
+import '../../di/home_module.dart';
 
 abstract class AppModule {
   void registerDependencies();
@@ -23,7 +24,7 @@ class _ServiceLocator implements Injector {
 
   @override
   void initializeDependencies() {
-    final appModules = <AppModule>[CoreModule()];
+    final appModules = <AppModule>[CoreModule(), HomeModule()];
 
     for (final module in appModules) {
       module.registerDependencies();

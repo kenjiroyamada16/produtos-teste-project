@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '../models/api_response.dart';
 import '../models/endpoint.dart';
@@ -11,9 +13,15 @@ abstract class ApiProviderProtocol {
 class ApiProvider extends ApiProviderProtocol {
   static final ApiProviderProtocol instance = ApiProvider._();
 
-  ApiProvider._();
-
   final Dio _dio = Dio();
+
+  ApiProvider._() {
+    final interceptors = <Interceptor>[
+      if (kDebugMode) PrettyDioLogger(requestBody: true, requestHeader: true),
+    ];
+
+    _dio.interceptors.addAll(interceptors);
+  }
 
   @override
   Future<ApiResponse<T>> request<T>(Endpoint endpoint) async {

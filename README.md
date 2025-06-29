@@ -62,10 +62,22 @@ ___
 
 ### Rodando o projeto Flutter
 
-- Para isso, não há configurações iniciais específicas, apenas garanta que a rota a ser utilizada seja a mesma da especificada no `api_host.dart`!
+- Para garantir a visualização correta da lista, precisamos deixar a rota para a nossa API disponível à nossa aplicação Flutter. Para testar com aplicativos próprios para isso como Postman ou Insomnia, você apenas precisa realizar as etapas acima porém, para disponibilizar a rota sem problemas para o nosso Frontend, precisaremos do [ngrok](https://ngrok.com/downloads/windows).
 
-  ```sh
-  flutter run
-  ```
+  - Após inicializar a API:
+    ```sh
+    ngrok http 5258 (ou outro port onde a API esteja rodando)
+    ```
+  - Em seguida, com o comando acima, uma URL será disponibilizada, parecida com esta: `https://788f-200-152-81-65.ngrok-free.app`. Copie-a e adicione ao `api_host.dart` do projeto Flutter como `baseUrl`.
 
-  ou `Run and Debug` do VSCode.
+  - Feito! Seus projetos estão conectados e você já pode inicializar a parte mobile:
+
+    ```sh
+    flutter run
+    ```
+
+    ou `Run and Debug` do VSCode.
+
+___
+
+- Obs: Tenho ciência de que deixei a ApiKey desprotegida. Implementei dessa forma para facilitar os testes e análise do projeto por terceiros e também para manter o foco na funcionalidade em vez de investir tempo na segurança de um projeto que não vai para o ambiente de produção. Obrigado!

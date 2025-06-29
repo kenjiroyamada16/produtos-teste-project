@@ -1,8 +1,8 @@
 class Pagy {
-  final int totalItems;
-  final int totalPages;
-  final int currentPage;
-  final int pageSize;
+  int totalItems;
+  int totalPages;
+  int currentPage;
+  int pageSize;
 
   Pagy({
     required this.totalItems,
@@ -10,6 +10,10 @@ class Pagy {
     required this.currentPage,
     required this.pageSize,
   });
+
+  factory Pagy.initial() {
+    return Pagy(totalItems: 0, totalPages: 1, currentPage: 1, pageSize: 0);
+  }
 
   factory Pagy.fromJson(Map<String, dynamic> map) {
     return Pagy(
