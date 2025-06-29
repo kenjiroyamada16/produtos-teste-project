@@ -20,9 +20,15 @@ class ProductItemView extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        spacing: 12,
         children: [
-          SizedBox.square(
-            dimension: 80,
+          Container(
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.horizontal(left: Radius.circular(12)),
+            ),
+            width: 80,
+            height: 80,
             child: Image.network(
               viewModel.imageUrl,
               fit: BoxFit.contain,

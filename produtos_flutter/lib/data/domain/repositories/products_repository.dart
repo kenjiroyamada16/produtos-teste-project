@@ -4,7 +4,7 @@ import '../models/api_response.dart';
 import '../models/endpoint.dart';
 
 abstract class ProductsRepositoryProtocol {
-  Future<ApiResponse<ProductsList>> getProducts({int? page, int? itemsCount});
+  Future<ApiResponse<ProductsList>> getProducts({String? query, int? page, int? itemsCount});
 }
 
 class ProductsRepository extends ProductsRepositoryProtocol {
@@ -14,6 +14,7 @@ class ProductsRepository extends ProductsRepositoryProtocol {
 
   @override
   Future<ApiResponse<ProductsList>> getProducts({
+    String? query,
     int? page,
     int? itemsCount,
   }) async {
@@ -21,6 +22,7 @@ class ProductsRepository extends ProductsRepositoryProtocol {
       method: 'GET',
       path: '/Products',
       queryParameters: {
+        if (query != null) 'query': query,
         if (page != null) 'page': page.toString(),
         if (itemsCount != null) 'pageSize': itemsCount.toString(),
       },

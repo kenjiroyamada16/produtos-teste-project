@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart' show ScrollController;
+import 'package:flutter/material.dart'
+    show ScrollController, TextEditingController;
 
 import '../../data/domain/models/api_response.dart';
 import '../../data/domain/repositories/products_repository.dart';
 import '../../models/pagy.dart';
 import '../../models/product.dart';
+import '../../support/utils/debouncer.dart';
 import '../../support/utils/extensions/exception_extensions.dart';
 import 'components/product_item/product_item_view.dart';
 import 'components/product_item/product_item_view_model.dart';
@@ -11,8 +13,10 @@ import 'home_view.dart';
 
 class HomeViewModel extends HomeViewModelProtocol {
   bool _isLoading = false;
+  String _searchQuery = '';
   String _errorMessage = '';
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchTextController = TextEditingController();
 
   Pagy _pagy = Pagy.initial();
   final List<Product> _productsList = List.empty(growable: true);
@@ -37,6 +41,9 @@ class HomeViewModel extends HomeViewModelProtocol {
   int get totalPages => _pagy.totalPages;
 
   @override
+  TextEditingController get searchTextController => _searchTextController;
+
+  @override
   List<ProductItemViewModelProtocol> get productItemViewModels {
     return _productsList.map((product) {
       return ProductItemViewModel(product: product);
@@ -45,12 +52,36 @@ class HomeViewModel extends HomeViewModelProtocol {
 
   @override
   Future<void> getProductsList(int page) async {
+    await _getProductsList(page);
+  }
+
+  @override
+  void didSearchProduct(String text) {
+    final debouncer = Debouncer();
+
+    debouncer.run(() {
+      _searchQuery = text;
+      _resetProductsList();
+    });
+  }
+
+  @override
+  void didTapClearSearch() {
+    _searchQuery = '';
+    _searchTextController.text = '';
+    _resetProductsList();
+  }
+
+  Future<void> _getProductsList(int page) async {
     if (_isLoading) return;
 
     _isLoading = true;
     notifyListeners();
 
-    final response = await productsRepository.getProducts(page: page);
+    final response = await productsRepository.getProducts(
+      page: page,
+      query: _searchQuery,
+    );
 
     switch (response) {
       case Success():
@@ -64,5 +95,11 @@ class HomeViewModel extends HomeViewModelProtocol {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  void _resetProductsList() {
+    _productsList.clear();
+    _pagy = Pagy.initial();
+    _getProductsList(_pagy.currentPage);
   }
 }

@@ -19,11 +19,20 @@ public class ProductsController : ControllerBase
     [FromQuery]
     int page = 1,
     [FromQuery]
-    int pageSize = 10)
+    int pageSize = 10,
+    [FromQuery]
+    string? query = null)
   {
     pageSize = Math.Min(pageSize, 20);
 
-    var (data, pagy) = await _dbContext.Products.AddPagination(page, pageSize);
+    var productsList = _dbContext.Products.AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(query))
+    {
+      productsList = productsList.Where(product => product.Title.Contains(query));
+    }
+
+    var (data, pagy) = await productsList.AddPagination(page, pageSize);
     var response = new PaginatedResponse<Product>(data, pagy);
 
     return Ok(response);

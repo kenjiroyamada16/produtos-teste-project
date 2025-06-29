@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../support/utils/components/paginated_list.dart';
+import '../../support/components/paginated_list.dart';
 import '../../support/utils/injector.dart';
 import 'components/product_item/product_item_view.dart';
 
@@ -9,11 +9,14 @@ abstract class HomeViewModelProtocol with ChangeNotifier {
   int get currentPage;
   bool get isLoading;
   String get errorMessage;
+  TextEditingController get searchTextController;
   List<ProductItemViewModelProtocol> get productItemViewModels;
 
   ScrollController get scrollController;
 
   void getProductsList(int page);
+  void didTapClearSearch();
+  void didSearchProduct(String text);
 }
 
 class HomeView extends StatefulWidget {
@@ -35,25 +38,47 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: ListenableBuilder(
-          listenable: viewModel,
-          builder: (_, __) {
-            return CustomScrollView(
-              controller: viewModel.scrollController,
-              slivers: [
-                SliverAppBar(
-                  collapsedHeight: 100,
-                  expandedHeight: 180,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Text('Produtos'),
-                    centerTitle: true,
+      body: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: SafeArea(
+          child: ListenableBuilder(
+            listenable: viewModel,
+            builder: (_, __) {
+              return CustomScrollView(
+                controller: viewModel.scrollController,
+                slivers: [
+                  SliverAppBar(
+                    collapsedHeight: 100,
+                    expandedHeight: 180,
+                    flexibleSpace: FlexibleSpaceBar(
+                      title: Text('Produtos'),
+                      centerTitle: true,
+                    ),
                   ),
-                ),
-                _bodyWidget,
-              ],
-            );
-          },
+                  SliverPadding(
+                    padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
+                    sliver: SliverToBoxAdapter(
+                      child: TextFormField(
+                        onChanged: viewModel.didSearchProduct,
+                        controller: viewModel.searchTextController,
+                        decoration: InputDecoration(
+                          hintText: 'Pesquise por um produto!',
+                          suffixIcon: IconButton(
+                            onPressed: viewModel.didTapClearSearch,
+                            icon: Icon(Icons.cancel_outlined),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  _bodyWidget,
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
